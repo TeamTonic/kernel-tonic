@@ -3,7 +3,7 @@
 # Uses the official prebuilt ROCm MI300X/vLLM image as base.
 # See: https://www.amd.com/en/developer/resources/technical-articles/how-to-use-prebuilt-amd-rocm-vllm-docker-image-with-amd-instinct-mi300x-accelerators.html
 
-FROM rocm/vllm:mi300x-latest
+FROM rocm/vllm:latest
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
