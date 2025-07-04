@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  kernel-tonic-train:
+    build: .
+    image: kernel-tonic:latest
+    container_name: kernel-tonic-train
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+      - CUDA_VISIBLE_DEVICES=0
+      - ROCR_VISIBLE_DEVICES=0
+    volumes:
+      - ./data:/workspace/data
+      - ./models:/workspace/models
+      - ./logs:/workspace/logs
+      - ./checkpoints:/workspace/checkpoints
+    command: ["train", "--config", "small", "--batch-size", "4", "--num-epochs", "1"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: amd
+              count: 1
+              capabilities: [gpu]
+
+  kernel-tonic-vllm:
+    build: .
+    image: kernel-tonic:latest
+    container_name: kernel-tonic-vllm
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - ROCR_VISIBLE_DEVICES=0
+    volumes:
+      - ./models:/workspace/models
+      - ./logs:/workspace/logs
+    ports:
+      - "8000:8000"
+    command: ["vllm"]
+    depends_on:
+      - kernel-tonic-train
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: amd
+              count: 1
+              capabilities: [gpu]
+
+  kernel-tonic-export:
+    build: .
+    image: kernel-tonic:latest
+    container_name: kernel-tonic-export
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - ROCR_VISIBLE_DEVICES=0
+    volumes:
+      - ./checkpoints:/workspace/checkpoints
+      - ./models:/workspace/models
+    command: ["export", "--checkpoint", "/workspace/checkpoints/best_model.pt", "--output-dir", "/workspace/models/kernel-tonic", "--config", "small"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: amd
+              count: 1
+              capabilities: [gpu] 

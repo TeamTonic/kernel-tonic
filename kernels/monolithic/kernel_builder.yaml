@@ -1,0 +1,24 @@
+# Kernel Builder configuration for monolithic OLMo/MI300X kernel project
+name: kernel-tonic-monolithic
+version: 0.1.0
+description: >
+  Monolithic kernel-builder project for OLMo-based model optimized for AMD MI300X.
+  Includes custom HIP kernels for attention, MLP, LayerNorm, embedding, and quantization (FP8).
+author: Kernel Tonic Team
+backend: hip
+entry_points:
+  - name: monolithic_kernel
+    file: kernel.hip
+    functions:
+      - name: attention_fp8
+        description: Optimized multi-head attention with FP8 support
+      - name: mlp_fp8
+        description: Optimized MLP with FP8 support
+      - name: rmsnorm_fp8
+        description: RMSNorm with FP8 support
+      - name: embedding_fp8
+        description: Embedding lookup with FP8 support
+      - name: quantize_fp8
+        description: Quantization kernel for FP8
+      - name: dequantize_fp8
+        description: Dequantization kernel for FP8 
