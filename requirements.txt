@@ -1,21 +1,24 @@
-# Core PyTorch and ROCm dependencies
-torch>=2.7.0
-torchvision>=0.14.0
-torchaudio>=2.7.0
+# =========================
+# ROCm/MI300X Requirements
+# =========================
 
-# AMD ROCm specific packages
+# PyTorch, TorchVision, and Torchaudio for ROCm/MI300X
+# DO NOT install from PyPI. Instead, follow the official ROCm install instructions:
+# https://rocm.docs.amd.com/projects/install-on-linux/en/develop/install/3rd-party/pytorch-install.html
+# Example (for ROCm 6.x, Python 3.10):
+# pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.0
+
+# AMD ROCm Python bindings
 hip-python>=0.1.0
-rocm-pytorch
-# Transformer Engine and Flash Attention
-transformer-engine>=1.14.0
-flash-attn
 
-# vLLM for inference
+# Transformer Engine (ROCm support is experimental; use with caution)
+transformer-engine>=1.14.0
+
+# vLLM for inference (ROCm support is experimental; use with caution)
 vllm
 
 # Quantization support
-bitsandbytes
-auto-gptq
+# auto-gptq  # CPU quantization only; GPU quantization is CUDA-only
 
 # Hugging Face ecosystem
 transformers>=4.35.0
@@ -25,7 +28,7 @@ accelerate>=0.24.0
 peft>=0.7.0
 
 # Training and optimization
-deepspeed>=0.12.0
+# deepspeed  # ROCm support is experimental; uncomment if needed and test carefully
 wandb>=0.16.0
 tensorboard>=2.14.0
 

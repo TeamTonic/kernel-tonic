@@ -1,7 +1,7 @@
 # Dockerfile for Kernel Tonic - OLMo-based model optimized for AMD MI300X
 # Based on AMD ROCm and optimized for vLLM inference
 
-FROM amd/rocm:5.7.3-ubuntu-22.04
+FROM amd/rocm:6.0.2-ubuntu-22.04
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
@@ -24,34 +24,15 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Upgrade pip and setuptools
 RUN pip3 install --upgrade pip setuptools wheel
 
-# Install PyTorch with ROCm support
-RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm5.7
+# Install PyTorch, TorchVision, and Torchaudio for ROCm 6.x
+RUN pip3 install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.0
 
-# Install vLLM with AMD support
-RUN pip3 install vllm[amd]
-
-# Install Hugging Face ecosystem
-RUN pip3 install transformers datasets tokenizers accelerate
-
-# Install additional dependencies for kernel-builder
-RUN pip3 install kernel-builder
-
-# Install other required packages
-RUN pip3 install \
-    numpy \
-    pandas \
-    scipy \
-    pyyaml \
-    hydra-core \
-    omegaconf \
-    wandb \
-    tensorboard \
-    tqdm \
-    rich \
-    click
+# Copy requirements.txt and install all other dependencies
+COPY requirements.txt /workspace/requirements.txt
+RUN pip3 install --no-cache-dir -r /workspace/requirements.txt
 
 # Set working directory
 WORKDIR /workspace
@@ -83,15 +64,7 @@ elif [ "$1" = "export" ]; then\n\
     python scripts/export_vllm.py "${@:2}"\n\
 elif [ "$1" = "vllm" ]; then\n\
     echo "Starting vLLM server..."\n\
-    python -m vllm.entrypoints.openai.api_server \\\n\
-        --model /workspace/models/kernel-tonic \\\n\
-        --tensor-parallel-size 1 \\\n\
-        --gpu-memory-utilization 0.9 \\\n\
-        --max-model-len 8192 \\\n\
-        --dtype fp8 \\\n\
-        --quantization fp8 \\\n\
-        --host 0.0.0.0 \\\n\
-        --port 8000\n\
+    python -m vllm.entrypoints.openai.api_server \\\n        --model /workspace/models/kernel-tonic \\\n        --tensor-parallel-size 1 \\\n        --gpu-memory-utilization 0.9 \\\n        --max-model-len 8192 \\\n        --dtype fp8 \\\n        --quantization fp8 \\\n        --host 0.0.0.0 \\\n        --port 8000\n\
 else\n\
     echo "Usage: docker run <image> [train|export|vllm] [args...]"\n\
     echo "  train: Start training the model"\n\
