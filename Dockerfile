@@ -1,7 +1,9 @@
 # Dockerfile for Kernel Tonic - OLMo-based model optimized for AMD MI300X
-# Based on AMD ROCm and optimized for vLLM inference
+# NOTE: This image is intended to be built and run on MI300X hardware only.
+# Uses the official prebuilt ROCm MI300X/vLLM image as base.
+# See: https://www.amd.com/en/developer/resources/technical-articles/how-to-use-prebuilt-amd-rocm-vllm-docker-image-with-amd-instinct-mi300x-accelerators.html
 
-FROM amd/rocm:6.0.2-ubuntu-22.04
+FROM rocm/vllm:mi300x-latest
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
@@ -9,15 +11,13 @@ ENV ROCR_VISIBLE_DEVICES=0
 ENV HSA_OVERRIDE_GFX_VERSION=11.0.0
 ENV HIP_VISIBLE_DEVICES=0
 
-# Install system dependencies
+# Install system dependencies (if needed)
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
     git \
     wget \
     curl \
-    python3 \
-    python3-pip \
     python3-dev \
     libopenblas-dev \
     liblapack-dev \
@@ -27,10 +27,7 @@ RUN apt-get update && apt-get install -y \
 # Upgrade pip and setuptools
 RUN pip3 install --upgrade pip setuptools wheel
 
-# Install PyTorch, TorchVision, and Torchaudio for ROCm 6.x
-RUN pip3 install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.0
-
-# Copy requirements.txt and install all other dependencies
+# Copy requirements and install project-specific dependencies (excluding torch/rocm/vllm)
 COPY requirements.txt /workspace/requirements.txt
 RUN pip3 install --no-cache-dir -r /workspace/requirements.txt
 

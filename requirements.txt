@@ -2,20 +2,14 @@
 # ROCm/MI300X Requirements
 # =========================
 
-# PyTorch, TorchVision, and Torchaudio for ROCm/MI300X
-# DO NOT install from PyPI. Instead, follow the official ROCm install instructions:
-# https://rocm.docs.amd.com/projects/install-on-linux/en/develop/install/3rd-party/pytorch-install.html
-# Example (for ROCm 6.x, Python 3.10):
-# pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.0
+# DO NOT include torch, torchvision, torchaudio, or vllm here.
+# These are provided by the base image: rocm/vllm:mi300x-latest
 
 # AMD ROCm Python bindings
 hip-python>=0.1.0
 
 # Transformer Engine (ROCm support is experimental; use with caution)
 transformer-engine>=1.14.0
-
-# vLLM for inference (ROCm support is experimental; use with caution)
-vllm
 
 # Quantization support
 # auto-gptq  # CPU quantization only; GPU quantization is CUDA-only
