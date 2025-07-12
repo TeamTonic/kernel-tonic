@@ -1,9 +1,9 @@
 #!/bin/bash
-# Complete training pipeline for Kernel Tonic model
+# Simple training pipeline for Kernel Tonic model (no Docker)
 
 set -e
 
-echo "=== Kernel Tonic Training Pipeline ==="
+echo "=== Kernel Tonic Training Pipeline (No Docker) ==="
 
 # Check for HF token
 if [ -z "$HF_TOKEN" ]; then
@@ -16,18 +16,8 @@ fi
 # Create directories
 mkdir -p data models logs checkpoints
 
-echo "=== Building Docker Image ==="
-docker build -t kernel-tonic:latest .
-
 echo "=== Starting Training ==="
-docker-compose up kernel-tonic-train
-
-echo "=== Exporting Model for vLLM ==="
-docker-compose up kernel-tonic-export
-
-echo "=== Starting vLLM Inference Server ==="
-docker-compose up -d kernel-tonic-vllm
+python scripts/train.py --config small --batch-size 2 --num-epochs 4
 
 echo "=== Training Pipeline Complete ==="
-echo "vLLM server is running on http://localhost:8000"
-echo "You can now make inference requests to the API" 
+echo "Checkpoints and logs are available in ./checkpoints and ./logs." 

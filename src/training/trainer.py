@@ -15,7 +15,7 @@ from typing import Optional, Dict, Any
 from tqdm import tqdm
 import wandb
 
-from ..model.config import KernelTonicConfig, get_small_config, get_medium_config, get_large_config
+from ..model.config import KernelTonicConfig, get_small_config, get_medium_config, get_large_config, get_xlarge_config
 from ..model.architecture import KernelTonicForCausalLM
 from ..model.kernel_integration import quantize_model_fp8, dequantize_model_fp8
 from .datasets import get_aya_dataset
