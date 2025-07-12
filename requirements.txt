@@ -1,102 +1,67 @@
 # =========================
-# ROCm/MI300X Requirements
+# NVIDIA/CUDA Requirements
 # =========================
 
-# PyTorch, TorchVision, and Torchaudio for ROCm/MI300X
-# DO NOT install from PyPI. Instead, follow the official ROCm install instructions:
-# https://rocm.docs.amd.com/projects/install-on-linux/en/develop/install/3rd-party/pytorch-install.html
-# Example (for ROCm 6.x, Python 3.10):
-# pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.0
+# PyTorch, TorchVision, and Torchaudio for CUDA
+# Recommended: install via pip (CUDA 11.8+)
+# https://pytorch.org/get-started/locally/
+# Example:
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
 # =========================
 # Core dependencies
 # =========================
 
-# Hugging Face Transformers (validated on ROCm/MI300X)
 transformers
-
-# Hugging Face Datasets (for data loading)
+torch
 datasets
-
-# Hugging Face Hub (for model uploads)
 huggingface_hub
-
-# Optimum-AMD for ROCm acceleration (recommended for AMD GPUs)
-optimum[amd]
+optimum
 
 # =========================
 # Model Acceleration Libraries
 # =========================
 
-# Flash Attention 2 (ROCm/CK version, must be built from source)
-# See: https://rocm.docs.amd.com/en/latest/how-to/rocm-for-ai/inference-optimization/model-acceleration-libraries.html
-# Install with:
-#   git clone https://github.com/ROCm/flash-attention.git
-#   cd flash-attention
-#   GPU_ARCHS=gfx942 python setup.py install
+# Flash Attention 2 (CUDA version, must be built from source for most GPUs)
+# https://github.com/Dao-AILab/flash-attention
+# pip install flash-attn --no-build-isolation
 
-# xFormers (ROCm/CK version, must be built from source)
-#   git clone https://github.com/ROCm/xformers.git
-#   cd xformers
-#   git submodule update --init --recursive
-#   PYTORCH_ROCM_ARCH=gfx942 python setup.py install
+# xFormers (CUDA version, available on PyPI for most GPUs)
+xformers
 
 # =========================
 # vLLM (LLM Inference)
 # =========================
-# vLLM ROCm support: must be built from source for MI300X
-# See: https://docs.vllm.ai/en/latest/getting_started/amd-installation.html
-#   git clone https://github.com/vllm-project/vllm.git
-#   cd vllm
-#   pip install -e .
-# Or use AMD's prebuilt Docker image for MI300X
+# vLLM (CUDA version, available on PyPI)
+vllm
 
 # =========================
 # Quantization Libraries
 # =========================
 
-# AMD Quark (recommended for FP8/INT8 quantization on MI300X)
-amd-quark
-
-# AutoGPTQ (ROCm wheels available, see docs)
-# pip install auto-gptq --no-build-isolation --extra-index-url https://huggingface.github.io/autogptq-index/whl/rocm573/
-
-# bitsandbytes (ROCm fork, must be built from source)
-#   git clone --recurse https://github.com/ROCm/bitsandbytes.git
-#   cd bitsandbytes
-#   git checkout rocm_enabled_multi_backend
-#   pip install -r requirements-dev.txt
-#   cmake -DBNB_ROCM_ARCH="gfx942" -DCOMPUTE_BACKEND=hip -S .
-#   make
-#   python setup.py install
+# AutoGPTQ (CUDA version, available on PyPI)
+auto-gptq
+bitsandbytes
 
 # =========================
-# Transformer Engine (ROCm fork)
+# Transformer Engine (NVIDIA version)
 # =========================
-# See: https://github.com/ROCm/TransformerEngine
-#   git clone --recursive https://github.com/ROCm/TransformerEngine.git
-#   cd TransformerEngine
-#   export NVTE_ROCM_ARCH=gfx942
-#   pip install .
+# https://github.com/NVIDIA/TransformerEngine
+# pip install transformer-engine
 
 # =========================
 # Training, Logging, Utilities
 # =========================
 
-# Weights & Biases (wandb) - supported
 wandb
-# TensorBoard - supported
 tensorboard
-# PyYAML - supported
 pyyaml
-# Hydra - supported
 hydra-core
-# OmegaConf - supported
 omegaconf
-# pytest-cov - supported
 pytest-cov
-# PEFT (Parameter-Efficient Fine-Tuning) - supported
 peft
+tqdm
+requests
 
 # =========================
 # Project-specific modules
@@ -106,6 +71,6 @@ peft
 # =========================
 # Notes
 # =========================
-# - Only include packages above that are available on PyPI or have a clear ROCm install method.
-# - For vLLM, transformer-engine, flash-attn, xformers, bitsandbytes, and auto-gptq, follow the ROCm-specific build instructions.
-# - Remove or comment out any package not validated for ROCm/MI300X. 
+# - Only include packages above that are available on PyPI or have a clear CUDA install method.
+# - For flash-attn and transformer-engine, you may need to build from source for some GPU architectures.
+# - Remove or comment out any package not validated for CUDA/NVIDIA GPUs. 
