@@ -18,18 +18,17 @@ import wandb
 from ..model.config import KernelTonicConfig, get_small_config, get_medium_config, get_large_config
 from ..model.architecture import KernelTonicForCausalLM
 from ..model.kernel_integration import quantize_model_fp8, dequantize_model_fp8
-from .datasets import get_oscar_dataset
+from .datasets import get_aya_dataset
 
 
-class OSCARDataset(IterableDataset):
-    """Iterable dataset wrapper for Colossal OSCAR 1.0."""
-    
+class AyaDataset(IterableDataset):
+    """Iterable dataset wrapper for CohereLabs/aya_collection_language_split (all languages, all splits)."""
     def __init__(self, dataset, tokenizer, max_length: int = 2048, buffer_size: int = 1000):
         self.dataset = dataset
         self.tokenizer = tokenizer
         self.max_length = max_length
         self.buffer_size = buffer_size
-    
+
     def __iter__(self):
         worker_info = torch.utils.data.get_worker_info()
         
@@ -44,12 +43,14 @@ class OSCARDataset(IterableDataset):
             dataset = self.dataset
         
         buffer = []
-        for sample in dataset:
-            # Tokenize the text
-            text = sample.get('content', '')
-            if not text:
-                continue
-            
+        for sample in self.dataset:
+            # Try to get text from common fields
+            text = sample.get('content')
+            if text is None:
+                # Try other common Aya fields
+                text = sample.get('inputs')
+                if text is None:
+                    continue
             # Tokenize and truncate
             tokens = self.tokenizer.encode(text, max_length=self.max_length, truncation=True)
             if len(tokens) < 10:  # Skip very short sequences
@@ -265,11 +266,11 @@ def main():
         trainer.load_checkpoint(args.checkpoint)
     
     # Load dataset
-    logger.info("Loading Colossal OSCAR 1.0 dataset...")
-    dataset = get_oscar_dataset()
-    
+    logger.info("Loading CohereLabs/aya_collection_language_split dataset (all languages, all splits)...")
+    dataset = get_aya_dataset()
+
     # Create dataloader
-    train_dataset = OSCARDataset(dataset, tokenizer, max_length=args.max_length)
+    train_dataset = AyaDataset(dataset, tokenizer, max_length=args.max_length)
     train_dataloader = DataLoader(
         train_dataset,
         batch_size=args.batch_size,
